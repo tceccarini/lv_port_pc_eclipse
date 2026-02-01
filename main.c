@@ -55,26 +55,48 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
  *   GLOBAL FUNCTIONS
  **********************/
 
+#define DISPLAY_WIDTH 480
+#define DISPLAY_HEIGHT 320
+
+#define CANVAS_WIDTH 481
+#define CANVAS_HEIGHT 321
 int main(int argc, char **argv)
 {
   /*Initialize LVGL*/
   lv_init();
 
   /*Initialize the display, and the input devices*/
-  hal_init(480, 320);
+  hal_init(DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
-  /*Open a demo or an example*/
-  if (argc <= 1) {
-	/*If not argument if provided just a open a demo or an example.*/
-    lv_demo_widgets();
-//      lv_example_chart_1();
-  } else {
-	/*Process the command line arguments and open the related demo*/
-    if (!lv_demos_create(&argv[1], argc - 1)) {
-      lv_demos_show_help();
-      goto demo_end;
-    }
-  }
+
+  /*Create a buffer for the canvas*/
+  LV_DRAW_BUF_DEFINE_STATIC(draw_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_ARGB8888);
+  LV_DRAW_BUF_INIT_STATIC(draw_buf);
+
+  /*Create a canvas and initialize its palette*/
+  lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
+  lv_canvas_set_draw_buf(canvas, &draw_buf);
+  lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
+  lv_obj_center(canvas);
+
+  lv_layer_t layer;
+  lv_canvas_init_layer(canvas, &layer);
+
+  lv_draw_line_dsc_t dsc;
+  lv_draw_line_dsc_init(&dsc);
+  dsc.color = lv_palette_main(LV_PALETTE_RED);
+  dsc.width = 4;
+  dsc.round_end = 1;
+  dsc.round_start = 1;
+  dsc.p1.x = 0;
+  dsc.p1.y = 0;
+  dsc.p2.x = CANVAS_WIDTH;
+  dsc.p2.y = CANVAS_HEIGHT;
+  lv_draw_line(&layer, &dsc);
+
+  lv_canvas_finish_layer(canvas, &layer);
+
+
 
   /*To hide the memory and performance indicators in the corners
    *disable `LV_USE_MEM_MONITOR` and `LV_USE_PERF_MONITOR` in `lv_conf.h`*/
