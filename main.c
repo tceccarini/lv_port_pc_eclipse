@@ -58,8 +58,8 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 #define DISPLAY_WIDTH 480
 #define DISPLAY_HEIGHT 320
 
-#define CANVAS_WIDTH 481
-#define CANVAS_HEIGHT 321
+#define CANVAS_WIDTH 960
+#define CANVAS_HEIGHT 640
 int main(int argc, char **argv)
 {
   /*Initialize LVGL*/
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 
   lv_layer_t layer;
   lv_canvas_init_layer(canvas, &layer);
-
+/*
   lv_draw_line_dsc_t dsc;
   lv_draw_line_dsc_init(&dsc);
   dsc.color = lv_palette_main(LV_PALETTE_RED);
@@ -92,9 +92,32 @@ int main(int argc, char **argv)
   dsc.p1.y = 0;
   dsc.p2.x = CANVAS_WIDTH;
   dsc.p2.y = CANVAS_HEIGHT;
-  lv_draw_line(&layer, &dsc);
+  lv_draw_line(&layer, &dsc);*/
 
-  lv_canvas_finish_layer(canvas, &layer);
+  lv_draw_triangle_dsc_t tri_dsc;
+      lv_draw_triangle_dsc_init(&tri_dsc);
+      tri_dsc.p[0].x = 0;
+      tri_dsc.p[0].y = 0;
+      tri_dsc.p[1].x = CANVAS_WIDTH/2;
+      tri_dsc.p[1].y = CANVAS_HEIGHT;
+      tri_dsc.p[2].x = CANVAS_WIDTH;
+      tri_dsc.p[2].y = 0;
+
+      tri_dsc.grad.stops_count = 2;
+      tri_dsc.grad.dir = LV_GRAD_DIR_VER;
+      tri_dsc.grad.stops[0].color = lv_color_hex(0xff0000);
+      tri_dsc.grad.stops[0].frac = 64;    /*Start at 25%*/
+      tri_dsc.grad.stops[0].opa = LV_OPA_COVER;
+      tri_dsc.grad.stops[1].color = lv_color_hex(0x0000ff);
+      tri_dsc.grad.stops[1].opa = LV_OPA_COVER;
+      tri_dsc.grad.stops[1].frac = 3 * 64;    /*End at 75%*/
+
+      tri_dsc.opa = 255;  /*Set the overall opacity to 50%*/
+
+      lv_draw_triangle(&layer, &tri_dsc);
+
+
+	lv_canvas_finish_layer(canvas, &layer);
 
 
 
